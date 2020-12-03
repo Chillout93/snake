@@ -10,6 +10,7 @@ export type AppState = {
     boardSize: number,
     gameOver: boolean,
     intervalId: NodeJS.Timeout,
+    gameCounter: number,
     direction: Direction,
     score: number,
     highScore: number
@@ -24,7 +25,8 @@ export default class App extends React.Component<{}, AppState> {
         highScore: 10,
         gameOver: true,
         intervalId: null,
-        direction: "Down"
+        direction: "Down",
+        gameCounter: 1
     }
 
     componentDidMount() {

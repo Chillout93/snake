@@ -14,19 +14,29 @@ export type Apple = {
     y: number
 }
 
+export type BoardPart = {
+    x: number,
+    y: number
+}
+
 export type Square = "Snake" | "Apple" | "Empty";
 
 // PUBLIC
 export const playGame = (state: AppState, setState: SetState) => {
-    let { snake, boardSize } = state;
+    let { snake, boardSize, gameCounter } = state;
 
     if (isGameOver(snake, boardSize - 1)) {
         clearInterval(state.intervalId);
-        setState({ intervalId: null, gameOver: true });
+        setState({ intervalId: null, gameOver: true, gameCounter: 1 });
+    }
+
+    if (gameCounter % 5 === 0) {
+        const newApple = moveApple(state);
+        setState({ apple: newApple });
     }
 
     const newSnake = moveSnake(state);
-    setState({ snake: newSnake });
+    setState({ snake: newSnake, gameCounter: gameCounter + 1 });
 }
 
 // Update snake direction, prevent it from travelling backwards.
@@ -45,7 +55,7 @@ const moveSnake = (state: AppState): SnakePart[] => {
     const { snake, direction, apple, boardSize } = state;
 
     let snakeHead = { ...snake[0] };
-    moveSnakeHead(snakeHead, direction);
+    moveBoardPart(snakeHead, direction);
 
     const newSnake = [snakeHead, ...snake];
     if (snakeHead.x === apple.x && snakeHead.y === apple.y) {
@@ -61,11 +71,21 @@ const moveSnake = (state: AppState): SnakePart[] => {
     return newSnake;
 }
 
-const moveSnakeHead = (snakePart: SnakePart, direction: Direction) => {
-    if (direction === "Left") snakePart.x -= 1;
-    else if (direction === "Up") snakePart.y -= 1;
-    else if (direction === "Down") snakePart.y += 1;
-    else if (direction === "Right") snakePart.x += 1;
+const moveApple = (state: AppState) => {
+    const random = Math.floor(Math.random() * 4);
+    const direction = (["Up", "Down", "Left", "Right"] as Direction[])[random];
+    const apple = state.apple;
+    moveBoardPart(apple, direction);
+
+    return apple;
+}
+
+
+const moveBoardPart = (boardPart: BoardPart, direction: Direction) => {
+    if (direction === "Left") boardPart.x -= 1;
+    else if (direction === "Up") boardPart.y -= 1;
+    else if (direction === "Down") boardPart.y += 1;
+    else if (direction === "Right") boardPart.x += 1;
 }
 
 // If new snakeHead location is going to exit grid or touch another part of the snake, it's game over.
