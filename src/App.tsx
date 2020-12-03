@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as _ from "lodash";
-import { Apple, handleKeyPress, SnakePart, Direction, playGame } from "./code";
+import { Apple, handleKeyPress, SnakePart, Direction, playGame, Poison } from "./code";
 import { renderBoard } from "./components";
 
 export type SetState = (state: Partial<AppState>) => void;
@@ -13,7 +13,8 @@ export type AppState = {
     gameCounter: number,
     direction: Direction,
     score: number,
-    highScore: number
+    highScore: number,
+    poison: Poison
 }
 
 export default class App extends React.Component<{}, AppState> {
@@ -26,7 +27,8 @@ export default class App extends React.Component<{}, AppState> {
         gameOver: true,
         intervalId: null,
         direction: "Down",
-        gameCounter: 1
+        gameCounter: 1,
+        poison: null
     }
 
     componentDidMount() {
@@ -36,7 +38,7 @@ export default class App extends React.Component<{}, AppState> {
     }
 
     render() {
-        const { boardSize, snake, gameOver, apple, score } = this.state;
+        const { boardSize, snake, gameOver, apple, score, poison } = this.state;
 
         return <div className="container">
             <div className="mt-5"></div>
@@ -44,7 +46,7 @@ export default class App extends React.Component<{}, AppState> {
             {gameOver ? <h2>Game Over!</h2> : <h2>Playing...</h2>}
             <h3>Score: {score}</h3>
             <button className="btn btn-primary mb-2" onClick={this.playAgain}>Play Game</button>
-            {renderBoard(boardSize, snake, apple)}
+            {renderBoard(boardSize, snake, apple, poison)}
         </div>
     }
 
@@ -60,8 +62,8 @@ export default class App extends React.Component<{}, AppState> {
         const snake: SnakePart[] = [{ x: boardSize / 2, y: boardSize / 2 }, { x: boardSize / 2, y: (boardSize / 2) - 1 }];
         const apple: Apple = { x: 5, y: 5 };
 
-        const intervalId = setInterval(() => playGame(this.state, this.setStateWrapper), 1000);
-        this.setState({ boardSize, snake, apple, intervalId, gameOver: false });
+        const intervalId = setInterval(() => playGame(this.state, this.setStateWrapper), 100);
+        this.setState({ boardSize, snake, apple, intervalId, gameOver: false, poison: null });
     }
 }
 
